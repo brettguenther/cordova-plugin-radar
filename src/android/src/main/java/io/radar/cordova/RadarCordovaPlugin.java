@@ -89,6 +89,8 @@ public class RadarCordovaPlugin extends CordovaPlugin {
                 offError(args, callbackContext);
             } else if (action.equals("startTrip")) {
                 startTrip(args, callbackContext);
+            } else if (action.equals("getTripOptions")) {
+                getTripOptions(args, callbackContext);
             } else if (action.equals("updateTrip")) {
                 updateTrip(args, callbackContext);
             } else if (action.equals("completeTrip")) {
@@ -472,6 +474,16 @@ public class RadarCordovaPlugin extends CordovaPlugin {
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
     }
 
+    public void getTripOptions(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+        RadarTripOptions tripOptions = Radar.getTripOptions();
+        JSONObject tripOptionsObj = new JSONObject();
+        if (tropOptionsObj != null) {
+            tripOptionsObj = tripOptions.toJson(); 
+        }
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, obj);
+        callbackContext.sendPluginResult(pluginResult);
+    }
+
     public void updateTrip(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         final JSONObject optionsObj = args.getJSONObject(0);
         
@@ -817,7 +829,7 @@ public class RadarCordovaPlugin extends CordovaPlugin {
             JSONObject originObj = originsArr.getJSONObject(i);
             double originLatitude = originObj.getDouble("latitude");
             double originLongitude = originObj.getDouble("longitude");
-            origin = new Location("RadarCordovaPlugin");
+            Location origin = new Location("RadarCordovaPlugin");
             origin.setLatitude(originLatitude);
             origin.setLongitude(originLongitude);
             origins[i] = origin;
@@ -851,7 +863,7 @@ public class RadarCordovaPlugin extends CordovaPlugin {
 
         Radar.getMatrix(origins, destinations, mode, units, new Radar.RadarMatrixCallback() {
             @Override
-            public void onComplete(Radar.RadarStatus status, RadarRouteMatrix routes) {
+            public void onComplete(Radar.RadarStatus status, RadarRouteMatrix matrix) {
                 try {
                     JSONObject obj = new JSONObject();
                     obj.put("status", status.toString());
